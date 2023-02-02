@@ -77,7 +77,7 @@ public class GameScreen implements Screen {
         batch = stage.getBatch();
 
         // Creem la nau i la resta d'objectes
-        bucket = new Bucket(368, 20, 64, 64);
+        bucket = new Bucket(368, 20, 64, 64, );
 
         // Afegim els actors a l'stage
         stage.addActor(bucket);

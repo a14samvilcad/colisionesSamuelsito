@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -25,9 +26,12 @@ public class Bucket extends Actor {
 
     private Rectangle collisionRect;
 
-    public Bucket(float x, float y, int width, int height){
+    private TiledMapTileLayer collisionLayer;
+
+    public Bucket(float x, float y, int width, int height, TiledMapTileLayer collisionLayer){
         this.width = width;
         this.height = height;
+        this.collisionLayer = collisionLayer;
         position = new Vector2(x, y);
 
         direction = WALLET_STANDING;
@@ -44,19 +48,103 @@ public class Bucket extends Actor {
 
     public void act(float delta){
         super.act(delta);
+
+        //Collision con objectos "blocked"
+        float oldX = getX();
+        float oldY = getY();
+        boolean collisionX = false;
+        boolean collisionY = false;
+        float tileWidth = collisionLayer.getTileWidth();
+        float tileHeigth = collisionLayer.getTileHeight();
+
+        //Izquierda derecha left rigth
             if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A)){
+                //top left
+                collisionX = collisionLayer.getCell((int) (getX() / tileWidth),(int) ((getY() + getHeight() / tileHeigth)))
+                        .getTile().getProperties().containsKey("blocked");
+
+                //middle left
+                if (!collisionX) {
+                    collisionX = collisionLayer.getCell((int) (getX() / tileWidth), (int) ((getY() + getHeight() / 2) / tileHeigth))
+                            .getTile().getProperties().containsKey("blocked");
+                }
+
+                //bottom left
+                if (!collisionX) {
+                    collisionX = collisionLayer.getCell((int) (getX() / tileWidth), (int) (getY() / tileHeigth))
+                            .getTile().getProperties().containsKey("blocked");
+                }
+
+
                 this.position.x -= Settings.PLAYER_VELOCITY * Gdx.graphics.getDeltaTime();
             }
-            if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D)){
+            else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D)){
+                //top rigth
+                collisionX = collisionLayer.getCell((int) ((getX() + getWidth()) / tileWidth), (int) ((getY() + getHeight()) / tileHeigth))
+                        .getTile().getProperties().containsKey("blocked");
+
+                //middle rigth
+                if (!collisionX){
+                    collisionX = collisionLayer.getCell((int) ((getX() + getWidth()) / tileWidth), (int) ((getY() + getHeight() / 2) / tileHeigth))
+                            .getTile().getProperties().containsKey("blocked");
+                }
+
+                //bottom rigth
+                if (!collisionX){
+                    collisionX = collisionLayer.getCell((int) ((getX() + getWidth()) / tileWidth), (int) (getY() / tileHeigth))
+                            .getTile().getProperties().containsKey("blocked");
+                }
+
+
                 this.position.x += Settings.PLAYER_VELOCITY * Gdx.graphics.getDeltaTime();
             }
 
+            //ARRIBA
             if (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W)){
+                //top left
+                collisionY = collisionLayer.getCell((int) (getX() / tileWidth), (int) ((getY() + getHeight()) / tileHeigth))
+                        .getTile().getProperties().containsKey("blocked");
+
+                //top middle
+                if (!collisionY){
+                    collisionY = collisionLayer.getCell((int) ((getX() + getWidth() / 2) / tileWidth), (int) ((getY() + getHeight()) / tileHeigth))
+                            .getTile().getProperties().containsKey("blocked");
+                }
+
+                //top rigth
+                if (!collisionY){
+                    collisionY = collisionLayer.getCell((int) ((getX() + getWidth()) / tileWidth), (int) ((getY() + getHeight()) / tileHeigth))
+                            .getTile().getProperties().containsKey("blocked");
+                }
+
+
+
                 this.position.y += Settings.PLAYER_VELOCITY * Gdx.graphics.getDeltaTime();
             }
-            if (Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S)){
+
+            //ABAJO
+            else if (Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S)){
+                //bottom left
+                collisionY = collisionLayer.getCell((int) (getX() / tileWidth), (int) (getY() / tileHeigth))
+                        .getTile().getProperties().containsKey("blocked");
+
+                //bottom middle
+                if (!collisionY){
+                    collisionY = collisionLayer.getCell((int) ((getX() + getWidth() / 2) / tileWidth), (int) (getY() / tileHeigth))
+                            .getTile().getProperties().containsKey("blocked");
+                }
+
+                //bottom rigth
+                if(!collisionY){
+                    collisionY = collisionLayer.getCell((int) ((getX() + getWidth())  / tileWidth), (int) (getY() / tileHeigth))
+                            .getTile().getProperties().containsKey("blocked");
+                }
+
+
+
                 this.position.y -= Settings.PLAYER_VELOCITY * Gdx.graphics.getDeltaTime();
             }
+
 
             //Colision personaje con los bordes del mapa
             if (this.position.y <= 5){
