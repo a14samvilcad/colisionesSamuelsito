@@ -58,6 +58,7 @@ public class Bucket extends Actor {
         float tileHeigth = collisionLayer.getTileHeight();
 
         //Izquierda derecha left rigth
+            //left
             if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A)){
                 //top left
                 collisionX = collisionLayer.getCell((int) (getX() / tileWidth),(int) ((getY() + getHeight() / tileHeigth)))
@@ -78,6 +79,7 @@ public class Bucket extends Actor {
 
                 this.position.x -= Settings.PLAYER_VELOCITY * Gdx.graphics.getDeltaTime();
             }
+            //rigth
             else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D)){
                 //top rigth
                 collisionX = collisionLayer.getCell((int) ((getX() + getWidth()) / tileWidth), (int) ((getY() + getHeight()) / tileHeigth))
@@ -97,6 +99,12 @@ public class Bucket extends Actor {
 
 
                 this.position.x += Settings.PLAYER_VELOCITY * Gdx.graphics.getDeltaTime();
+            }
+
+            //reaccion a las colisiones de objetos del eje X
+            if (collisionX){
+                setX(oldX);
+                Settings.PLAYER_VELOCITY = 0;
             }
 
             //ARRIBA
@@ -143,6 +151,12 @@ public class Bucket extends Actor {
 
 
                 this.position.y -= Settings.PLAYER_VELOCITY * Gdx.graphics.getDeltaTime();
+            }
+
+            //reaccion a las colisiones del eje Y
+            if (collisionY){
+                setY(oldY);
+                Settings.PLAYER_VELOCITY = 0;
             }
 
 
